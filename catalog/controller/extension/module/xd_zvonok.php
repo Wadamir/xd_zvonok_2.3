@@ -1,230 +1,206 @@
 <?php
-class ControllerExtensionModuleXDZvonok extends Controller {
-	private $error = array();
+class ControllerExtensionModuleXDZvonok extends Controller
+{
+    private $error = array();
 
-	public function submit() {
+    function __construct($registry)
+    {
+        parent::__construct($registry);
+        $this->load->language('extension/module/xd_zvonok');
+        $this->load->model('setting/setting');
 
-		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+        $this->xd_zvonok_status = $this->config->get('xd_zvonok_status');
 
-			$this->load->language('extension/module/xd_zvonok');
-			$json = array();
-			$mail_text = '';
+        $this->xd_zvonok_field1_status = $this->config->get('xd_zvonok_field1_status');
+        $this->xd_zvonok_field1_required = $this->config->get('xd_zvonok_field1_required');
+        $this->xd_zvonok_field2_status = $this->config->get('xd_zvonok_field2_status');
+        $this->xd_zvonok_field2_required = $this->config->get('xd_zvonok_field2_required');
+        $this->xd_zvonok_field3_status = $this->config->get('xd_zvonok_field3_status');
+        $this->xd_zvonok_field3_required = $this->config->get('xd_zvonok_field3_required');
+        $this->xd_zvonok_validation_status = $this->config->get('xd_zvonok_validation_status');
+        $this->xd_zvonok_validation_type = $this->config->get('xd_zvonok_validation_type');
+        $this->xd_zvonok_agree_status = $this->config->get('xd_zvonok_agree_status');
 
-			if (isset($this->request->post['xd_zvonok_name'])) {
-				$xd_zvonok_name = $this->request->post['xd_zvonok_name'];
-				$mail_text .= $this->language->get('text_name') . $xd_zvonok_name . " \r\n";
-			}
+        if ($this->config->get('xd_zvonok_captcha')) {
+            $this->xd_zvonok_captcha = $this->load->controller('extension/captcha/' . $this->config->get('xd_zvonok_captcha'));
+        } else {
+            $this->xd_zvonok_captcha = '';
+        }
+    }
 
-			if (isset($this->request->post['xd_zvonok_phone'])) {
-				$xd_zvonok_phone = $this->request->post['xd_zvonok_phone'];
-				$mail_text .= $this->language->get('text_phone') . $xd_zvonok_phone . " \r\n";
-			}
+    public function info()
+    {
+        $this->load->model('setting/setting');
+        $data['xd_zvonok_status'] = $this->xd_zvonok_status;
+        $current_language_id = $this->config->get('config_language_id');
+        $data['xd_zvonok_success_field'] = $this->config->get('xd_zvonok_success_field_' . $current_language_id);
 
-			if (isset($this->request->post['xd_zvonok_message'])) {
-				$xd_zvonok_message = $this->request->post['xd_zvonok_message'];
-				$mail_text .= $this->language->get('text_message') . $xd_zvonok_message . " \r\n";
-			}
+        $data['xd_zvonok_field1_status'] = $this->xd_zvonok_field1_status;
+        $data['xd_zvonok_field1_required'] = $this->xd_zvonok_field1_required;
+        $data['xd_zvonok_field2_status'] = $this->xd_zvonok_field2_status;
+        $data['xd_zvonok_field2_required'] = $this->xd_zvonok_field2_required;
+        $data['xd_zvonok_field3_status'] = $this->xd_zvonok_field3_status;
+        $data['xd_zvonok_field3_required'] = $this->xd_zvonok_field3_required;
+        $data['xd_zvonok_validation_status'] = $this->xd_zvonok_validation_status;
+        $data['xd_zvonok_validation_type'] = $this->xd_zvonok_validation_type;
+        $data['xd_zvonok_agree_status'] = $this->xd_zvonok_agree_status;
 
-			if (!empty($this->request->server['REMOTE_ADDR'])) {
-				$ip = $this->request->server['REMOTE_ADDR'];
-				$mail_text .= $this->language->get('text_ip') . $ip . " \r\n";
-			}
+        $this->load->language('extension/module/xd_zvonok');
+        $data['xd_zvonok_modal_title'] = $this->language->get('xd_zvonok_modal_title');
+        $data['xd_zvonok_submit_button'] = $this->language->get('xd_zvonok_submit_button');
 
-			if (!empty($this->request->server['HTTP_X_FORWARDED_FOR'])) {
-				$forwarded_ip = $this->request->server['HTTP_X_FORWARDED_FOR'];
-				$mail_text .= $this->language->get('text_forwarded_ip') . $forwarded_ip . " \r\n";
-			} elseif (!empty($this->request->server['HTTP_CLIENT_IP'])) {
-				$forwarded_ip = $this->request->server['HTTP_CLIENT_IP'];
-				$mail_text .= $this->language->get('text_forwarded_ip') . $forwarded_ip . " \r\n";
-			}
+        if ($data['xd_zvonok_success_field'] == '') {
+            $data['xd_zvonok_success_field'] = htmlspecialchars_decode($this->language->get('xd_zvonok_success_field'));
+        } else {
+            $data['xd_zvonok_success_field'] = htmlspecialchars_decode($data['xd_zvonok_success_field']);
+        }
 
-			if (isset($this->request->server['HTTP_USER_AGENT'])) {
-				$user_agent = $this->request->server['HTTP_USER_AGENT'];
-				$mail_text .= $this->language->get('text_user_agent') . $user_agent . " \r\n";
-			}
-			/*
-			// Source first visit
-			$mail_text .= " \r\n" . $this->language->get('sb_first_visit_title') . " \r\n";
-			if (isset($this->request->post['sb_first_typ']) && $this->request->post['sb_first_typ'] != '') {
-				$sb_first_typ = $this->request->post['sb_first_typ'];
-				$mail_text .= $this->language->get('sb_first_typ') . $sb_first_typ . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_src']) && $this->request->post['sb_first_src'] != '') {
-				$sb_first_src = $this->request->post['sb_first_src'];
-				$mail_text .= $this->language->get('sb_first_src') . $sb_first_src . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_mdm']) && $this->request->post['sb_first_mdm'] != '') {
-				$sb_first_mdm = $this->request->post['sb_first_mdm'];
-				$mail_text .= $this->language->get('sb_first_mdm') . $sb_first_mdm . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_cmp']) && $this->request->post['sb_first_cmp'] != '') {
-				$sb_first_cmp = $this->request->post['sb_first_cmp'];
-				$mail_text .= $this->language->get('sb_first_cmp') . $sb_first_cmp . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_cnt']) && $this->request->post['sb_first_cnt'] != '') {
-				$sb_first_cnt = $this->request->post['sb_first_cnt'];
-				$mail_text .= $this->language->get('sb_first_cnt') . $sb_first_cnt . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_trm']) && $this->request->post['sb_first_trm'] != '') {
-				$sb_first_trm = $this->request->post['sb_first_trm'];
-				$mail_text .= $this->language->get('sb_first_trm') . $sb_first_trm . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_add_fd']) && $this->request->post['sb_first_add_fd'] != '') {
-				$sb_first_add_fd = $this->request->post['sb_first_add_fd'];
-				$mail_text .= $this->language->get('sb_first_add_fd') . $sb_first_add_fd . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_add_ep']) && $this->request->post['sb_first_add_ep'] != '') {
-				$sb_first_add_ep = $this->request->post['sb_first_add_ep'];
-				$mail_text .= $this->language->get('sb_first_add_ep') . $sb_first_add_ep . " \r\n";
-			}
-			if (isset($this->request->post['sb_first_add_rf']) && $this->request->post['sb_first_add_rf'] != '') {
-				$sb_first_add_rf = $this->request->post['sb_first_add_rf'];
-				$mail_text .= $this->language->get('sb_first_add_rf') . $sb_first_add_rf . " \r\n";
-			}
-			// Source first visit end
+        $data['xd_zvonok_field1_title'] = $this->language->get('xd_zvonok_field1_title');
+        $data['xd_zvonok_field2_title'] = $this->language->get('xd_zvonok_field2_title');
+        $data['xd_zvonok_field3_title'] = $this->language->get('xd_zvonok_field3_title');
+        $data['xd_zvonok_required_text'] = $this->language->get('xd_zvonok_required_text');
+        $data['xd_zvonok_error_required'] = $this->language->get('xd_zvonok_error_required');
+        $data['xd_zvonok_error_sending'] = $this->language->get('xd_zvonok_error_sending');
 
-			// Source current visit
-			$mail_text .= " \r\n" . $this->language->get('sb_current_visit_title') . " \r\n";
-			if (isset($this->request->post['sb_current_typ']) && $this->request->post['sb_current_typ'] != '') {
-				$sb_current_typ = $this->request->post['sb_current_typ'];
-				$mail_text .= $this->language->get('sb_current_typ') . $sb_current_typ . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_src']) && $this->request->post['sb_current_src'] != '') {
-				$sb_current_src = $this->request->post['sb_current_src'];
-				$mail_text .= $this->language->get('sb_current_src') . $sb_current_src . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_mdm']) && $this->request->post['sb_current_mdm'] != '') {
-				$sb_current_mdm = $this->request->post['sb_current_mdm'];
-				$mail_text .= $this->language->get('sb_current_mdm') . $sb_current_mdm . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_cmp']) && $this->request->post['sb_current_cmp'] != '') {
-				$sb_current_cmp = $this->request->post['sb_current_cmp'];
-				$mail_text .= $this->language->get('sb_current_cmp') . $sb_current_cmp . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_cnt']) && $this->request->post['sb_current_cnt'] != '') {
-				$sb_current_cnt = $this->request->post['sb_current_cnt'];
-				$mail_text .= $this->language->get('sb_current_cnt') . $sb_current_cnt . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_trm']) && $this->request->post['sb_current_trm'] != '') {
-				$sb_current_trm = $this->request->post['sb_current_trm'];
-				$mail_text .= $this->language->get('sb_current_trm') . $sb_current_trm . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_add_fd']) && $this->request->post['sb_current_add_fd'] != '') {
-				$sb_current_add_fd = $this->request->post['sb_current_add_fd'];
-				$mail_text .= $this->language->get('sb_current_add_fd') . $sb_current_add_fd . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_add_ep']) && $this->request->post['sb_current_add_ep'] != '') {
-				$sb_current_add_ep = $this->request->post['sb_current_add_ep'];
-				$mail_text .= $this->language->get('sb_current_add_ep') . $sb_current_add_ep . " \r\n";
-			}
-			if (isset($this->request->post['sb_current_add_rf']) && $this->request->post['sb_current_add_rf'] != '') {
-				$sb_current_add_rf = $this->request->post['sb_current_add_rf'];
-				$mail_text .= $this->language->get('sb_current_add_rf') . $sb_current_add_rf . " \r\n";
-			}
-			// Source current visit end
+        // $data['xd_zvonok_agree_status'] = $this->config->get('xd_zvonok_agree_status');
 
-			// Current session
-			$mail_text .= " \r\n" . $this->language->get('sb_session_title') . " \r\n";
-			if (isset($this->request->post['sb_session_pgs']) && $this->request->post['sb_session_pgs'] != '') {
-				$sb_session_pgs = $this->request->post['sb_session_pgs'];
-				$mail_text .= $this->language->get('sb_session_pgs') . $sb_session_pgs . " \r\n";
-			}
-			if (isset($this->request->post['sb_session_cpg']) && $this->request->post['sb_session_cpg'] != '') {
-				$sb_session_cpg = $this->request->post['sb_session_cpg'];
-				$mail_text .= $this->language->get('sb_session_cpg') . $sb_session_cpg . " \r\n";
-			}
-			// Current session end
+        // Captcha
+        $data['captcha'] = $this->xd_zvonok_captcha;
 
-			// Private data
-			$mail_text .= " \r\n" . $this->language->get('sb_private_title') . " \r\n";
-			if (isset($this->request->post['sb_udata_vst']) && $this->request->post['sb_udata_vst'] != '') {
-				$sb_udata_vst = $this->request->post['sb_udata_vst'];
-				$mail_text .= $this->language->get('sb_udata_vst') . $sb_udata_vst . " \r\n";
-			}
-			if (isset($this->request->post['sb_udata_uip']) && $this->request->post['sb_udata_uip'] != '') {
-				$sb_udata_uip = $this->request->post['sb_udata_uip'];
-				$mail_text .= $this->language->get('sb_udata_uip') . $sb_udata_uip . " \r\n";
-			}
-			if (isset($this->request->post['sb_udata_uag']) && $this->request->post['sb_udata_uag'] != '') {
-				$sb_udata_uag = $this->request->post['sb_udata_uag'];
-				$mail_text .= $this->language->get('sb_udata_uag') . $sb_udata_uag . " \r\n";
-			}
-			if (isset($this->request->post['sb_promo_code']) && $this->request->post['sb_promo_code'] != '') {
-				$sb_promo_code = $this->request->post['sb_promo_code'];
-				$mail_text .= $this->language->get('sb_promo_code') . $sb_promo_code . " \r\n";
-			}
-			// Private data end
-			*/
-			$from_email = 'xd_zvonok@' . $_SERVER['SERVER_NAME'];
-			$sender_name = $this->language->get('text_sender_name');
-			$mail_title = sprintf($this->language->get('text_mail_title'), $this->config->get('config_name'));
+        $this->load->model('catalog/information');
+        $information_info = $this->model_catalog_information->getInformation($this->xd_zvonok_agree_status);
+        if ($information_info) {
+            $data['xd_zvonok_text_agree'] = sprintf($this->language->get('xd_zvonok_text_agree'), $this->url->link('information/information/agree', 'information_id=' . $this->config->get('xd_zvonok_agree_status'), 'SSL'), $information_info['title'], $information_info['title']);
+        } else {
+            $data['xd_zvonok_text_agree'] = '';
+        }
+        $json['success'] = $this->load->view('extension/module/xd_zvonok', $data);
 
-			$mail = new Mail();
-			$mail->protocol = $this->config->get('config_mail_protocol');
-			$mail->parameter = $this->config->get('config_mail_parameter');
-			$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-			$mail->smtp_username = $this->config->get('config_mail_smtp_username');
-			$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-			$mail->smtp_port = $this->config->get('config_mail_smtp_port');
-			$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
 
-			$mail->setTo($this->config->get('config_email'));
-			// $mail->setTo('domus159@gmail.com');
-			$mail->setFrom($from_email);
-			$mail->setSender($sender_name);
-			$mail->setSubject($mail_title);
-			$mail->setText($mail_text);
-			$mail_result = $mail->send();
-			
-			// var_dump($this->config->get('config_alert_email'));
-			
-			$additional_emails = explode(',', $this->config->get('config_alert_email'));
-			$regexp = $this->config->get('config_mail_regexp') ? $this->config->get('config_mail_regexp') : '/^[^\@]+@.*.[a-z]{2,15}$/i';
+    public function submit()
+    {
+        if (!$this->validate()) {
+            $json['error'] = $this->error;
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+            return;
+        }
 
-			foreach ($additional_emails as $email) {
-				if ($email && preg_match($regexp, $email)) {
-					$mail->setTo($email);
-					$mail->send();
-				}
-			}			
+        if ($this->request->server['REQUEST_METHOD'] == 'POST') {
 
-			if (!$mail_result) {
-				$json['success'] = 'Success sending';
-			} else {
-				$json['error'] = 'Error sending';
-			}
-			$this->response->addHeader('Content-Type: application/json');
-			$this->response->setOutput(json_encode($json));
-		} else {
-			$json['error'] = 'Smth wrong... Error sending';
-			$this->response->addHeader('Content-Type: application/json');
-			$this->response->setOutput(json_encode($json));
-		}
+            $this->load->language('extension/module/xd_zvonok');
+            $json = array();
+            $mail_text = '';
 
-	}
+            if (isset($this->request->post['xd_zvonok_name'])) {
+                $xd_zvonok_name = $this->request->post['xd_zvonok_name'];
+                $mail_text .= $this->language->get('text_name') . $xd_zvonok_name . " \r\n";
+            }
 
-	protected function validate() {
-		if ((utf8_strlen($this->request->post['name']) < 1) || (utf8_strlen($this->request->post['name']) > 32)) {
-			$this->error['name'] = $this->language->get('error_name');
-		}
+            if (isset($this->request->post['xd_zvonok_phone'])) {
+                $xd_zvonok_phone = $this->request->post['xd_zvonok_phone'];
+                $mail_text .= $this->language->get('text_phone') . $xd_zvonok_phone . " \r\n";
+            }
 
-		if (!preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $this->request->post['email'])) {
-			$this->error['email'] = $this->language->get('error_email');
-		}
+            if (isset($this->request->post['xd_zvonok_message'])) {
+                $xd_zvonok_message = $this->request->post['xd_zvonok_message'];
+                $mail_text .= $this->language->get('text_message') . $xd_zvonok_message . " \r\n";
+            }
 
-		if ((utf8_strlen($this->request->post['enquiry']) < 10) || (utf8_strlen($this->request->post['enquiry']) > 3000)) {
-			$this->error['enquiry'] = $this->language->get('error_enquiry');
-		}
+            if (!empty($this->request->server['REMOTE_ADDR'])) {
+                $ip = $this->request->server['REMOTE_ADDR'];
+                $mail_text .= $this->language->get('text_ip') . $ip . " \r\n";
+            }
 
-		// Captcha
-		if ($this->config->get($this->config->get('config_captcha') . '_status') && in_array('contact', (array)$this->config->get('config_captcha_page'))) {
-			$captcha = $this->load->controller('captcha/' . $this->config->get('config_captcha') . '/validate');
+            if (!empty($this->request->server['HTTP_X_FORWARDED_FOR'])) {
+                $forwarded_ip = $this->request->server['HTTP_X_FORWARDED_FOR'];
+                $mail_text .= $this->language->get('text_forwarded_ip') . $forwarded_ip . " \r\n";
+            } elseif (!empty($this->request->server['HTTP_CLIENT_IP'])) {
+                $forwarded_ip = $this->request->server['HTTP_CLIENT_IP'];
+                $mail_text .= $this->language->get('text_forwarded_ip') . $forwarded_ip . " \r\n";
+            }
 
-			if ($captcha) {
-				$this->error['captcha'] = $captcha;
-			}
-		}
+            if (isset($this->request->server['HTTP_USER_AGENT'])) {
+                $user_agent = $this->request->server['HTTP_USER_AGENT'];
+                $mail_text .= $this->language->get('text_user_agent') . $user_agent . " \r\n";
+            }
 
-		return !$this->error;
-	}
+            $from_email = 'xd_zvonok@' . $_SERVER['SERVER_NAME'];
+            $sender_name = $this->language->get('text_sender_name');
+            $mail_title = sprintf($this->language->get('text_mail_title'), $this->config->get('config_name'));
+
+            $mail = new Mail();
+            $mail->protocol = $this->config->get('config_mail_protocol');
+            $mail->parameter = $this->config->get('config_mail_parameter');
+            $mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
+            $mail->smtp_username = $this->config->get('config_mail_smtp_username');
+            $mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
+            $mail->smtp_port = $this->config->get('config_mail_smtp_port');
+            $mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
+
+            $mail->setTo($this->config->get('config_email'));
+            // $mail->setTo('domus159@gmail.com');
+            $mail->setFrom($from_email);
+            $mail->setSender($sender_name);
+            $mail->setSubject($mail_title);
+            $mail->setText($mail_text);
+            $mail_result = $mail->send();
+
+            $additional_emails = explode(',', $this->config->get('config_alert_email'));
+            $regexp = $this->config->get('config_mail_regexp') ? $this->config->get('config_mail_regexp') : '/^[^\@]+@.*.[a-z]{2,15}$/i';
+
+            foreach ($additional_emails as $email) {
+                if ($email && preg_match($regexp, $email)) {
+                    $mail->setTo($email);
+                    $mail->send();
+                }
+            }
+
+            if (!$mail_result) {
+                $json['success'] = 'Success sending';
+            } else {
+                $json['error'] = 'Error sending';
+            }
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+        } else {
+            $json['error'] = 'Smth wrong... Error sending';
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+        }
+    }
+
+    protected function validate()
+    {
+        if ($this->xd_zvonok_field1_status && $this->xd_zvonok_field1_required) {
+            if ((utf8_strlen($this->request->post['xd_zvonok_name']) < 1) || (utf8_strlen($this->request->post['xd_zvonok_name']) > 32)) {
+                $this->error['xd_zvonok_name'] = $this->language->get('error_name');
+            }
+        }
+
+        if ($this->xd_zvonok_field2_status && $this->xd_zvonok_field2_required) {
+            if ((utf8_strlen($this->request->post['xd_zvonok_phone']) < 10) || (utf8_strlen($this->request->post['xd_zvonok_phone']) > 20)) {
+                $this->error['xd_zvonok_phone'] = $this->language->get('error_phone');
+            }
+        }
+
+        if ($this->xd_zvonok_field3_status && $this->xd_zvonok_field3_required) {
+            if ((utf8_strlen($this->request->post['xd_zvonok_message']) < 1) || (utf8_strlen($this->request->post['xd_zvonok_message']) > 3000)) {
+                $this->error['xd_zvonok_message'] = $this->language->get('error_message');
+            }
+        }
+
+        // Captcha
+        if ($this->config->get($this->config->get('xd_zvonok_captcha'))) {
+            $captcha = $this->load->controller('captcha/' . $this->config->get('xd_zvonok_captcha') . '/validate');
+            if ($captcha) {
+                $this->error['captcha'] = $captcha;
+            }
+        }
+
+        return !$this->error;
+    }
 }

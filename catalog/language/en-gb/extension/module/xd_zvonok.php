@@ -21,6 +21,13 @@ $_['text_user_agent'] 			= 'User agent: ';
 $_['text_sender_name'] 			= 'XD Zvonok';
 $_['text_mail_title'] 			= 'Callback order from %s';
 
+// errors
+$_['error_name'] 				= 'Name must be between 3 and 32 characters!';
+$_['error_phone'] 				= 'Phone number is incorrect!';
+$_['error_message'] 			= 'Message must be between 10 and 3000 characters!';
+$_['error_agree'] 				= 'You must agree to the %s!';
+$_['error_captcha'] 			= 'Captcha is incorrect!';
+
 // source
 $_['sb_first_visit_title'] 		= 'First visit';
 $_['sb_current_visit_title'] 	= 'Current visit';

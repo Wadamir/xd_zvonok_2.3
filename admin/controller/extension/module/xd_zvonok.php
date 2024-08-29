@@ -42,6 +42,8 @@ class ControllerExtensionModuleXDZvonok extends Controller
         // Entry
         $data['entry_button_name'] = $this->language->get('entry_button_name');
         $data['entry_status'] = $this->language->get('entry_status');
+
+        $data['entry_show_btn'] = $this->language->get('entry_show_btn');
         // $data['entry_style_status'] = $this->language->get('entry_style_status');
         $data['entry_success_field'] = $this->language->get('entry_success_field');
         $data['success_field_tooltip'] = htmlspecialchars($this->language->get('success_field_tooltip'));
@@ -69,12 +71,12 @@ class ControllerExtensionModuleXDZvonok extends Controller
         );
         if (!isset($this->request->get['module_id'])) {
             $data['breadcrumbs'][] = array(
-                'text' => $this->language->get('heading_title'),
+                'text' => $this->language->get('heading_name'),
                 'href' => $this->url->link('extension/module/xd_zvonok', 'token=' . $this->session->data['token'], true)
             );
         } else {
             $data['breadcrumbs'][] = array(
-                'text' => $this->language->get('heading_title'),
+                'text' => $this->language->get('heading_name'),
                 'href' => $this->url->link('extension/module/xd_zvonok', 'token=' . $this->session->data['token'] . '&module_id=' . $this->request->get['module_id'], true)
             );
         }
@@ -162,6 +164,11 @@ class ControllerExtensionModuleXDZvonok extends Controller
             $data['xd_zvonok_validation_type'] = $this->request->post['xd_zvonok_validation_type'];
         } else {
             $data['xd_zvonok_validation_type'] = $this->config->get('xd_zvonok_validation_type');
+        }
+        if (isset($this->request->post['xd_zvonok_show_btn'])) {
+            $data['xd_zvonok_show_btn'] = $this->request->post['xd_zvonok_show_btn'];
+        } else {
+            $data['xd_zvonok_show_btn'] = $this->config->get('xd_zvonok_show_btn');
         }
         /********************* STATUS *********************/
         if (isset($this->request->post['xd_zvonok_status'])) {

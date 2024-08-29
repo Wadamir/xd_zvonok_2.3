@@ -124,7 +124,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="border:none;">
                         <label class="col-sm-3 control-label" for="input-validation_type"><?php echo $entry_validation_type; ?></label>
                         <div class="col-sm-9">
                             <select name="xd_zvonok_validation_type" id="input-validation_type" class="form-control">
@@ -144,7 +144,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="border:none;">
                         <label class="col-sm-3 control-label"><?php echo $entry_captcha; ?></label>
                         <div class="col-sm-9">
                             <select name="xd_zvonok_captcha" id="input-captcha" class="form-control">
@@ -155,6 +155,20 @@
                                     <?php } else { ?>
                                         <option value="<?php echo $captcha['value']; ?>"><?php echo $captcha['text']; ?></option>
                                     <?php } ?>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="border:none;">
+                        <label class="col-sm-3 control-label" for="input-success"><?php echo $entry_show_btn; ?></label>
+                        <div class="col-sm-9">
+                            <select name="xd_zvonok_show_btn" id="input-show_btn" class="form-control">
+                                <?php if ($xd_zvonok_show_btn) { ?>
+                                    <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                                    <option value="0"><?php echo $text_disabled; ?></option>
+                                <?php } else { ?>
+                                    <option value="1"><?php echo $text_enabled; ?></option>
+                                    <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
                                 <?php } ?>
                             </select>
                         </div>
