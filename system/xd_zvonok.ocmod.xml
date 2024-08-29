@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<code>xdz113</code>
+    <name>XD_Zvonok for Opencart 2.3</name>
+    <version>1.1.3</version>
+    <author>Domus159@gmail.com</author>
+    <link>https://xdomus.ru/opencart/obratnyj-zvonok-dlya-opencart-2-besplatno/</link>
+    <file path="catalog/controller/common/header.php">
+        <operation>
+            <search>
+				<![CDATA[
+					$data['telephone'] = $this->config->get('config_telephone');
+				]]>
+			</search>
+            <add position="after">
+				<![CDATA[
+					$data['xd_zvonok_status'] = $this->config->get('xd_zvonok_status');
+					$data['xd_zvonok_validation_type'] = $this->config->get('xd_zvonok_validation_type');
+					$current_language_id = $this->config->get('config_language_id');
+					$data['xd_zvonok_button_name'] = $this->config->get('xd_zvonok_button_name_'.$current_language_id);
+					if ($data['xd_zvonok_button_name'] == '') {
+						$data['xd_zvonok_button_name'] = $this->language->get('xd_zvonok_button_name');
+					}
+				]]>
+			</add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/*/template/common/header.tpl">
+        <operation>
+            <search>
+				<![CDATA[
+					</head>
+				]]>
+			</search>
+            <add position="before"><![CDATA[
+				<?php if ($xd_zvonok_status) { ?>
+					<script src="catalog/view/javascript/xd_zvonok.js" type="text/javascript"></script>
+					<script src="catalog/view/javascript/sourcebuster.min.js" type="text/javascript"></script>
+					<link href="catalog/view/theme/default/stylesheet/xd_zvonok.css" rel="stylesheet">
+					<?php if ($xd_zvonok_status && $xd_zvonok_validation_type != 0) { ?>
+						<script src="catalog/view/javascript/jquery.mask.min.js" type="text/javascript"></script>
+						<script>
+							$(document).ready(function(){
+								$('#xd_zvonok_phone').mask('<?php echo $xd_zvonok_validation_type; ?>');
+							});
+						</script>
+					<?php } ?>
+				<?php } ?>
+            ]]></add>
+        </operation>
+        <operation>
+            <search>
+				<![CDATA[
+					<body class="<?php echo $class; ?>">
+				]]>
+			</search>
+            <add position="after"><![CDATA[
+				<?php if ($xd_zvonok_status) { ?>
+					<div class="pull-left">
+						<a href="javascript:void(0)" onclick="$('#xd_zvonok_modal').modal('show');" id="xd_zvonok_phone_button" class="btn btn-link">
+							<div class="circlephone" style="transform-origin: center;"></div>
+							<div class="circle-fill" style="transform-origin: center;"></div>
+							<div class="img-circle" style="transform-origin: center;">
+								<div class="img-circleblock" style="transform-origin: center;"><p style="margin:0;"><?php echo $xd_zvonok_button_name; ?></p></div>
+							</div>
+						</a>
+					</div>
+				<?php } ?>
+            ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/common/footer.php">
+        <operation>
+            <search>
+				<![CDATA[
+					$this->load->language('common/footer');
+				]]>
+			</search>
+            <add position="before"><![CDATA[
+				// XD_Zvonok
+					$this->load->model('setting/setting');
+					$data['xd_zvonok_status'] = $this->config->get('xd_zvonok_status');
+					$current_language_id = $this->config->get('config_language_id');
+					$data['xd_zvonok_success_field'] = $this->config->get('xd_zvonok_success_field_'.$current_language_id);
+
+					$data['xd_zvonok_field1_status'] = $this->config->get('xd_zvonok_field1_status');
+					$data['xd_zvonok_field1_required'] = $this->config->get('xd_zvonok_field1_required');
+					$data['xd_zvonok_field2_status'] = $this->config->get('xd_zvonok_field2_status');
+					$data['xd_zvonok_field2_required'] = $this->config->get('xd_zvonok_field2_required');
+					$data['xd_zvonok_field3_status'] = $this->config->get('xd_zvonok_field3_status');
+					$data['xd_zvonok_field3_required'] = $this->config->get('xd_zvonok_field3_required');
+					$data['xd_zvonok_validation_status'] = $this->config->get('xd_zvonok_validation_status');
+					$data['xd_zvonok_validation_type'] = $this->config->get('xd_zvonok_validation_type');
+
+					$this->load->language('extension/module/xd_zvonok');
+					$data['xd_zvonok_modal_title'] = $this->language->get('xd_zvonok_modal_title');
+					$data['xd_zvonok_submit_button'] = $this->language->get('xd_zvonok_submit_button');
+
+					if ($data['xd_zvonok_success_field'] == '') {
+						$data['xd_zvonok_success_field'] = htmlspecialchars_decode($this->language->get('xd_zvonok_success_field'));
+					} else {
+						$data['xd_zvonok_success_field'] = htmlspecialchars_decode($data['xd_zvonok_success_field']);
+					}
+
+					$data['xd_zvonok_field1_title'] = $this->language->get('xd_zvonok_field1_title');
+					$data['xd_zvonok_field2_title'] = $this->language->get('xd_zvonok_field2_title');
+					$data['xd_zvonok_field3_title'] = $this->language->get('xd_zvonok_field3_title');
+					$data['xd_zvonok_required_text'] = $this->language->get('xd_zvonok_required_text');
+					$data['xd_zvonok_error_required'] = $this->language->get('xd_zvonok_error_required');
+					$data['xd_zvonok_error_sending'] = $this->language->get('xd_zvonok_error_sending');
+
+					$data['xd_zvonok_agree_status'] = $this->config->get('xd_zvonok_agree_status');
+
+                    // Captcha
+                    // var_dump($this->config->get($this->config->get('xd_zvonok_captcha'));
+                    if ($this->config->get('xd_zvonok_captcha')) {
+                        $data['captcha'] = $this->load->controller('extension/captcha/' . $this->config->get('xd_zvonok_captcha'), $this->error);
+                    } else {
+                        $data['captcha'] = '';
+                    }
+
+					$this->load->model('catalog/information');
+					$information_info = $this->model_catalog_information->getInformation($this->config->get('xd_zvonok_agree_status'));
+					if ($information_info) {
+						$data['xd_zvonok_text_agree'] = sprintf($this->language->get('xd_zvonok_text_agree'), $this->url->link('information/information/agree', 'information_id=' . $this->config->get('xd_zvonok_agree_status'), 'SSL'), $information_info['title'], $information_info['title']);
+					} else {
+						$data['xd_zvonok_text_agree'] = '';
+					}
+				// XD_Zvonok
+            ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/*/template/common/footer.tpl">
+        <operation>
+            <search>
+				<![CDATA[
+					</body></html>
+				]]>
+			</search>
+            <add position="before"><![CDATA[
+				<?php if ($xd_zvonok_status) { ?>
+					<div id="xd_zvonok_success" class="modal fade">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-body">
+									<div class="text-center"><?php echo $xd_zvonok_success_field; ?></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="xd_zvonok_modal" class="modal fade">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<form id="xd_zvonok-form" action="index.php?route=extension/module/xd_zvonok/send" role="form">
+									<fieldset>
+										<div class="modal-header">
+											<button class="close" type="button" data-dismiss="modal">×</button>
+											<h2 class="modal-title"><?php echo $xd_zvonok_modal_title; ?></h2>
+										</div>
+										<div class="modal-body">
+											<div class="col-sm-12">
+												<div id="source" style="display:none">
+													<input id="sb_first_typ" class="hidden" type="text" name="sb_first_typ" value="">
+													<input id="sb_first_src" class="hidden" type="text" name="sb_first_src" value="">
+													<input id="sb_first_mdm" class="hidden" type="text" name="sb_first_mdm" value="">
+													<input id="sb_first_cmp" class="hidden" type="text" name="sb_first_cmp" value="">
+													<input id="sb_first_cnt" class="hidden" type="text" name="sb_first_cnt" value="">
+													<input id="sb_first_trm" class="hidden" type="text" name="sb_first_trm" value="">
+													
+													<input id="sb_current_typ" class="hidden" type="text" name="sb_current_typ" value="">
+													<input id="sb_current_src" class="hidden" type="text" name="sb_current_src" value="">
+													<input id="sb_current_mdm" class="hidden" type="text" name="sb_current_mdm" value="">
+													<input id="sb_current_cmp" class="hidden" type="text" name="sb_current_cmp" value="">
+													<input id="sb_current_cnt" class="hidden" type="text" name="sb_current_cnt" value="">
+													<input id="sb_current_trm" class="hidden" type="text" name="sb_current_trm" value="">
+
+													<input id="sb_first_add_fd" class="hidden" type="text" name="sb_first_add_fd" value="">
+													<input id="sb_first_add_ep" class="hidden" type="text" name="sb_first_add_ep" value="">
+													<input id="sb_first_add_rf" class="hidden" type="text" name="sb_first_add_rf" value="">
+
+													<input id="sb_current_add_fd" class="hidden" type="text" name="sb_current_add_fd" value="">
+													<input id="sb_current_add_ep" class="hidden" type="text" name="sb_current_add_ep" value="">
+													<input id="sb_current_add_rf" class="hidden" type="text" name="sb_current_add_rf" value="">
+
+													<input id="sb_session_pgs" class="hidden" type="text" name="sb_session_pgs" value="">
+													<input id="sb_session_cpg" class="hidden" type="text" name="sb_session_cpg" value="">
+
+													<input id="sb_udata_vst" class="hidden" type="text" name="sb_udata_vst" value="">
+													<input id="sb_udata_uip" class="hidden" type="text" name="sb_udata_uip" value="">
+													<input id="sb_udata_uag" class="hidden" type="text" name="sb_udata_uag" value="">
+													<input id="sb_promo_code" class="hidden" type="text" name="sb_promo_code" value="">
+												</div>
+												<?php if ($xd_zvonok_field1_status) { ?>
+													<div class="input-group<?php if ($xd_zvonok_field1_required) { echo ' has-warning';} ?>">
+														<span class="input-group-addon"><i class="fa fa-fw fa-user" aria-hidden="true"></i></span>
+														<input id="xd_zvonok_name" class="form-control<?php if ($xd_zvonok_field1_required) { echo ' required';} ?>" type="text" name="xd_zvonok_name" placeholder="<?php echo $xd_zvonok_field1_title; ?>">
+													</div>
+													<input id="xd_zvonok_name_title" class="hidden" type="text" name="xd_zvonok_name_title" value="<?php echo $xd_zvonok_field1_title; ?>">
+													<br />
+												<?php } ?>
+												<?php if ($xd_zvonok_field2_status) { ?>
+													<div class="input-group<?php if ($xd_zvonok_field2_required) { echo ' has-warning';} ?>">
+														<span class="input-group-addon"><i class="fa fa-fw fa-phone-square" aria-hidden="true"></i></span>
+														<input id="xd_zvonok_phone" class="form-control<?php if ($xd_zvonok_field2_required) { echo ' required';} ?>" type="tel" name="xd_zvonok_phone" placeholder="<?php echo $xd_zvonok_field2_title; ?>">
+													</div>
+													<input id="xd_zvonok_phone_title" class="hidden" type="text" name="xd_zvonok_phone_title" value="<?php echo $xd_zvonok_field2_title; ?>">
+													<br />
+												<?php } ?>
+												<?php if ($xd_zvonok_field3_status) { ?>
+													<div class="form-group<?php if ($xd_zvonok_field3_required) { echo ' has-warning';} ?>">
+														<textarea id="xd_zvonok_message" class="form-control<?php if ($xd_zvonok_field3_required) { echo ' required';} ?>" name="xd_zvonok_message" rows="3" placeholder="<?php echo $xd_zvonok_field3_title; ?>"></textarea>
+													</div>
+													<input id="xd_zvonok_message_title" class="hidden" type="text" name="xd_zvonok_message_title" value="<?php echo $xd_zvonok_field3_title; ?>">
+												<?php } ?>
+                                                <div class="form-group">
+                                                    <?php echo $captcha; ?>
+                                                </div>
+											</div>
+											<div class="clearfix"></div>
+											<?php if ($xd_zvonok_agree_status) { ?>
+												<div class="col-sm-12">
+													<p><?php echo $xd_zvonok_text_agree; ?></p>
+												</div>
+												<div class="clearfix"></div>
+											<?php } ?>
+										</div>
+										<div class="modal-footer">
+											<div class="col-sm-2 hidden-xs">
+											</div>
+											<div class="col-sm-8 col-xs-12">
+												<button type="submit" class="btn btn-lg btn-block btn-default"><?php echo $xd_zvonok_submit_button; ?></button>
+											</div>
+											<div class="col-sm-2 hidden-xs">
+											</div>
+										</div>
+									</fieldset>
+								</form>
+							</div>
+						</div>
+					</div>
+					<script>
+						sbjs.init({
+							callback: placeData
+						});
+
+						function placeData(sb) {
+							document.getElementById('sb_first_typ').value       = sb.first.typ;
+							document.getElementById('sb_first_src').value       = sb.first.src;
+							document.getElementById('sb_first_mdm').value       = sb.first.mdm;
+							document.getElementById('sb_first_cmp').value       = sb.first.cmp;
+							document.getElementById('sb_first_cnt').value       = sb.first.cnt;
+							document.getElementById('sb_first_trm').value       = sb.first.trm;
+
+							document.getElementById('sb_current_typ').value     = sb.current.typ;
+							document.getElementById('sb_current_src').value     = sb.current.src;
+							document.getElementById('sb_current_mdm').value     = sb.current.mdm;
+							document.getElementById('sb_current_cmp').value     = sb.current.cmp;
+							document.getElementById('sb_current_cnt').value     = sb.current.cnt;
+							document.getElementById('sb_current_trm').value     = sb.current.trm;
+
+							document.getElementById('sb_first_add_fd').value    = sb.first_add.fd;
+							document.getElementById('sb_first_add_ep').value    = sb.first_add.ep;
+							document.getElementById('sb_first_add_rf').value    = sb.first_add.rf;
+
+							document.getElementById('sb_current_add_fd').value  = sb.current_add.fd;
+							document.getElementById('sb_current_add_ep').value  = sb.current_add.ep;
+							document.getElementById('sb_current_add_rf').value  = sb.current_add.rf;
+
+							document.getElementById('sb_session_pgs').value     = sb.session.pgs;
+							document.getElementById('sb_session_cpg').value     = sb.session.cpg;
+
+							document.getElementById('sb_udata_vst').value       = sb.udata.vst;
+							document.getElementById('sb_udata_uip').value       = sb.udata.uip;
+							document.getElementById('sb_udata_uag').value       = sb.udata.uag;
+
+							document.getElementById('sb_promo_code').value      = sb.promo.code;
+						}
+					</script>
+				<?php } ?>
+            ]]></add>
+		</operation>
+    </file>
+</modification>
