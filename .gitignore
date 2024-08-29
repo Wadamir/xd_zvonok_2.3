@@ -76,6 +76,15 @@
 !/catalog/view/theme/
 /catalog/view/theme/default/*
 !/catalog/view/theme/default/
+/catalog/view/theme/default/template/*
+!/catalog/view/theme/default/template/
+/catalog/view/theme/default/template/extension/*
+!/catalog/view/theme/default/template/extension/
+/catalog/view/theme/default/template/extension/module/*
+!/catalog/view/theme/default/template/extension/module/
+!/catalog/view/theme/default/template/extension/module/xd_zvonok.tpl
+
+
 /catalog/view/theme/default/stylesheet/*
 !/catalog/view/theme/default/stylesheet/
 !/catalog/view/theme/default/stylesheet/xd_zvonok.css
