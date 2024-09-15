@@ -74,7 +74,6 @@
                                 <p id="xd_zvonok_captcha_error" class="text-error hidden"></p>
                             </div>
                         <?php } ?>
-                        <div id="xd_captcha" class="input_wrapper"></div>
                     </div>
                     <div class=" clearfix">
                     </div>
