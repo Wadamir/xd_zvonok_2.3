@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     btnZvonokEvents();
 
-    getCaptcha();
+    // getCaptcha();
 });
 
 const getCaptcha = () => {
@@ -48,6 +48,7 @@ const btnZvonokEvents = () => {
                 inputEvents();
                 phoneEvents();
             })
+            .then(getCaptcha());
         });
     }
 }
