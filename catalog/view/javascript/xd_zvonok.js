@@ -47,8 +47,11 @@ const btnZvonokEvents = () => {
                 formEvents();
                 inputEvents();
                 phoneEvents();
+                getCaptcha();
             })
-            .then(getCaptcha());
+            .catch(error => {
+                console.error(error);
+            });
         });
     }
 }
