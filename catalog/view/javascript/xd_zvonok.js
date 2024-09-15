@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const getCaptcha = () => {
+    const xd_captcha = document.getElementById('xd_captcha');
     const url = 'index.php?route=extension/module/xd_zvonok/get_captcha';
     fetch(url, {
         method: 'GET',
@@ -18,8 +19,7 @@ const getCaptcha = () => {
     .then(data => {
         console.log(data);
         if(data['captcha']) {
-            console.log('captcha success');
-            console.log(data['captcha']);
+            xd_captcha.innerHTML = data['captcha'];
         }
     });
 
