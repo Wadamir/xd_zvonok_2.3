@@ -194,8 +194,8 @@ class ControllerExtensionModuleXDZvonok extends Controller
         }
 
         // Captcha
-        if ($this->config->get($this->config->get('xd_zvonok_captcha'))) {
-            $captcha = $this->load->controller('captcha/' . $this->config->get('xd_zvonok_captcha') . '/validate');
+        if ($this->config->get('xd_zvonok_captcha')) {
+            $captcha = $this->load->controller('extension/captcha/' . $this->config->get('xd_zvonok_captcha') . '/validate');
             if ($captcha) {
                 $this->error['captcha'] = $captcha;
             }
