@@ -203,4 +203,13 @@ class ControllerExtensionModuleXDZvonok extends Controller
 
         return !$this->error;
     }
+
+    function get_captcha()
+    {
+        $this->load->language('extension/module/xd_zvonok');
+        $json = array();
+        $json['captcha'] = $this->xd_zvonok_captcha;
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
 }

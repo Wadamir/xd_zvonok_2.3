@@ -2,7 +2,28 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log('XD Zvonok DOM loaded');
     
     btnZvonokEvents();
+
+    getCaptcha();
 });
+
+const getCaptcha = () => {
+    const url = 'index.php?route=extension/module/xd_zvonok/get_captcha';
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if(data['captcha']) {
+            console.log('captcha success');
+            console.log(data['captcha']);
+        }
+    });
+
+}
 const btnZvonokEvents = () => {
     const buttons = document.getElementsByClassName('xd_zvonok_btn');
     for (let i = 0; i < buttons.length; i++) {
