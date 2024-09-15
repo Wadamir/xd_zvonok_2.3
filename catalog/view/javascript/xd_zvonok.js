@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const getCaptcha = () => {
     const xd_captcha = document.getElementById('xd_captcha');
-    const url = 'index.php?route=extension/module/xd_zvonok/get_captcha';
+    const url = 'index.php?route=extension/module/xd_zvonok/info';
     fetch(url, {
         method: 'GET',
         headers: {
