@@ -17,7 +17,7 @@ const getCaptcha = () => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        console.log(data['captcha']);
         if(data['captcha']) {
             xd_captcha.innerHTML = data['captcha'];
         }
