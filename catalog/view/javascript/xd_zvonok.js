@@ -22,7 +22,6 @@ const getCaptcha = () => {
             xd_captcha.innerHTML = data['captcha'];
         }
     });
-
 }
 const btnZvonokEvents = () => {
     const buttons = document.getElementsByClassName('xd_zvonok_btn');
