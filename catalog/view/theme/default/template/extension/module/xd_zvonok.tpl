@@ -66,8 +66,6 @@
                                 <p id="xd_zvonok_message_error" class="text-error hidden"></p>
                             </div>
                         <?php } ?>
-                        <div id="xd_captcha" class="input_wrapper"></div>
-                        <?php /*
                         <?php if ($captcha !== '') { ?>
                             <div class="input_wrapper">
                                 <div class="form-group">
@@ -76,7 +74,7 @@
                                 <p id="xd_zvonok_captcha_error" class="text-error hidden"></p>
                             </div>
                         <?php } ?>
-                        */ ?>
+                        <div id="xd_captcha" class="input_wrapper"></div>
                     </div>
                     <div class=" clearfix">
                     </div>

@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const getCaptcha = () => {
     const xd_captcha = document.getElementById('xd_captcha');
-    const url = 'index.php?route=extension/module/xd_zvonok/get_captcha';
-    fetch(url, {
+    const captcha_url = 'index.php?route=extension/module/xd_zvonok/get_captcha';
+    fetch(captcha_url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
