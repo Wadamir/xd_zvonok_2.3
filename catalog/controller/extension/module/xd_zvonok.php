@@ -207,8 +207,9 @@ class ControllerExtensionModuleXDZvonok extends Controller
     function get_captcha()
     {
         // $this->load->language('extension/module/xd_zvonok');
+        $xd_zvonok_captcha = $this->load->controller('extension/captcha/' . $this->config->get('xd_zvonok_captcha'));
         $json = array();
-        $json['captcha'] = $this->xd_zvonok_captcha;
+        $json['captcha'] = $xd_zvonok_captcha;
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
     }
